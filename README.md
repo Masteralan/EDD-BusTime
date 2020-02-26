@@ -11,3 +11,13 @@ Data sent to client should not include actual bus locations for security.
 
 ## Client
 Web page for client to interact with and view information.
+
+
+## NPM Package List
+To run these JS programs, you need to install npm (`$ sudo apt install npm`), as well as these packages using `$ npm install package_name`.
+
+These are the packages you need (currently):
+- file-system
+- ws
+  - bufferutil
+  - utf-8-validate
