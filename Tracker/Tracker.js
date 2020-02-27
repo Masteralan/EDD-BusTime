@@ -1,1 +1,37 @@
 // Should send packets to server
+
+// Created with help of my brother, basis pulled off from https://github.com/Maxattax97/sample-nodejs-host-client
+
+const modulesRoot = "../node_modules/";
+const https = require(modulesRoot + "https");
+const http = require(modulesRoot + "http");
+const request = require(modulesRoot + "request");
+
+// Send data packet to server
+function sendMessage(obj) {
+    request.post({
+        url: "https://127.0.0.1:8443/api/gps",
+        method: "POST",
+        json: true,
+        body: obj,
+        rejectUnauthorized: false,
+    }, (err, res, body) => {
+        if (err)
+            console.error(err);
+        else
+            console.log("Successfully sent message");
+    });
+}
+
+// Periodically send message info
+setInterval(() => {
+    const message = {
+        lat: 0,
+        long: 0,
+        alt: 0,
+        time: (new Date()).toISOString(),
+    };
+
+    console.log("Uploading data to server:", message);
+    sendMessage(message);
+}, 1000);
