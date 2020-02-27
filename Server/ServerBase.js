@@ -1,6 +1,9 @@
 // Created with help of my brother, basis pulled off from https://github.com/Maxattax97/sample-nodejs-host-client
 // Takes and interprets packets from modules and clients
 
+// from EDDBusTracker: $ node ./Server/ServerBase.js
+// connect to https:/localhost:8443 from browser
+
 const modulesRoot = "../node_modules/";
 
 const fs = require(modulesRoot + "file-system");
@@ -13,13 +16,13 @@ const parser = require(modulesRoot + "body-parser");
 
 //const ws = require(modulesRoot + "ws");
 
+const webPage = fs.readFileSync("Client/index.html", "utf8");
+
 const app = express();
 app.use(parser.urlencoded({extended:false}));
 app.use(parser.json());
 
 let latest_gps = null;
-
-const webPage = "<body>\n<h1>testing</h1><br><p>one, two, three</p></body>";
 
 app.post("api/gps", (req, res) => {
     console.log("Recieved GPS input", req.body);
@@ -32,6 +35,7 @@ app.get("api/gps", (req, res) => {
     res.send(latest_gps);
 });
 
+// Typical browser-access, send them web-page info
 app.all("/", (req, res) => {
     console.log("Displaying front page");
     res.send(webPage);
