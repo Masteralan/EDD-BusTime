@@ -3,8 +3,8 @@
 // Created with help of my brother, basis pulled off from https://github.com/Maxattax97/sample-nodejs-host-client
 
 const modulesRoot = "../node_modules/";
-const https = require(modulesRoot + "https");
-const http = require(modulesRoot + "http");
+const https = require("https");
+const http = require("http");
 const request = require(modulesRoot + "request");
 
 // Send data packet to server

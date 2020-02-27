@@ -5,8 +5,8 @@ const modulesRoot = "../node_modules/";
 
 const fs = require(modulesRoot + "file-system");
 
-const https = require(modulesRoot + "https");
-const http = require(modulesRoot + "http");
+const https = require("https");
+const http = require("http");
 
 const express = require(modulesRoot + "express");
 const parser = require(modulesRoot + "body-parser");
@@ -15,7 +15,7 @@ const parser = require(modulesRoot + "body-parser");
 
 const app = express();
 app.use(parser.urlencoded({extended:false}));
-app.use(body.json());
+app.use(parser.json());
 
 let latest_gps = null;
 
