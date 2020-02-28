@@ -4,14 +4,14 @@
     <!-- CSS for Looks -->
     <style type="text/css">
 		body {
-			background-color: #248a29;
+			background-color: #f1f0d0;
 		}
 		iframe {
 			height: 375px;
 			width: 75%;
 		}
 		form {
-			margin: 20%;
+			text-align: center;
 			font-family: Arial, Helvetica, sans-serif;
 			font-size: 20px;
 		}
@@ -21,54 +21,23 @@
 			text-align: center;
 			font-family: Arial, Sans-serif;
 			font-size: 20px;
-			background-color: #52c78c;
+			background-color: #0e6e0e;
+			color: #ece13e;
 		}
-        div.route {
-            margin: 0%;
-            text-align: left;
-            text-indent: 5%;
-            height: 100px;
-            background-color: #fff1f1;
-        }
-
-        div.main_body {
-			margin-left: 25%;
-			margin-right: 25%;
-			text-align: center;
-			font-family: Arial, Sans-serif;
-			font-size: 24px;
-			background-color: #d0d0d0;
-			padding:2%;
-		}
-		div.sidebar_embed {
-			margin: 1%;
-			float: right;
-			width: 20%;
-			overflow: scroll;
-			height: 700px;
-		}
-		div.sidebar_links {
-			margin: 1%;
-			float: left;
-			width: 20%;
-			text-indent: 15px;
-			font-family: Arial, Sans-serif;
-			font-size: 24px;
-			background-color: #52c78c;
-        }
 	</style>
 </head>
 <body>
     <div class="main_header">
         <h1>Bus Time</h1>
-    </div>
+	</div>
+	
 	<form action="/view" method="post"> <!-- Writing basic HTML forms here: ttps://www.w3schools.com/html/html_forms.asp -->
 		<label for="username">Username</label>
 		<input type="text" id="username" name="username">
-		<br>
+		<br><br>
 		<label for="password">Password</label>
 		<input type="password" id="password" name="password">
-		<br>
-		<input type="submit">
+		<br><br>
+		<input type="submit" text="Login">
 	</form>
 </body>
