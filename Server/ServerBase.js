@@ -23,18 +23,27 @@ const app = express();
 app.use(parser.urlencoded({extended:false}));
 app.use(parser.json());
 
+//var BusData = require("./BusData.js");
 let latest_gps = null;
 
-app.post("api/gps", (req, res) => {
+var IsTracking = true;
+
+app.post("/api/gps", (req, res) => {
     console.log("Recieved GPS input", req.body);
     latest_gps = req.body;
-    res.send("Success!");
+
+    // Respond by telling the tracker to keep sending data (or to be done)
+    res.send(IsTracking);
 });
 
-app.get("api/gps", (req, res) => {
+/*
+app.get("/api/gps", (req, res) => {
     console.log("Sending latest GPS data:", latest_gps);
     res.send(latest_gps);
 });
+*/
+
+
 
 // Typical browser-access, send them web-page info
 app.all("/", (req, res) => {
@@ -43,15 +52,16 @@ app.all("/", (req, res) => {
 })
 app.post("/view", (req, res) => {
     console.log("On webpage, recieved login request", req.body);
+
     if (req.body.username == "admin" && req.body.password == "password") {
         console.log("Login succeeded!");
         res.send(webPage);
-    } else {
+
+    } else {    // Deny client and boot them back to login panel
         console.log("Login failed.");
-        res.send("<body>Login failed</body>");
+        res.send("<body><h1>Login failed</h1><meta http-equiv=\"refresh\" content=1; url=\"../\"/></body>");
     }
 })
-
 
 // To generate new keys: openssl req -nodes -new -x509 -keyout key.pem -out cert.pem
 http.createServer(app).listen(8000);

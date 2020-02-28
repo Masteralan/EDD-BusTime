@@ -7,8 +7,12 @@ const https = require("https");
 const http = require("http");
 const request = require(modulesRoot + "request");
 
-// Send data packet to server
-function sendMessage(obj) {
+const trackerInfo = require("./TrackerInfo.json");
+
+var ContinueTracking = true;
+
+// Sends a data packet to server
+function SendPacket(obj) {
     request.post({
         url: "https://127.0.0.1:8443/api/gps",
         method: "POST",
@@ -18,20 +22,32 @@ function sendMessage(obj) {
     }, (err, res, body) => {
         if (err)
             console.error(err);
-        else
-            console.log("Successfully sent message");
+        else {
+            if (!body)  // If the server says to stop tracking, then stop tracking
+                ContinueTracking = false;
+        }
     });
 }
 
-// Periodically send message info
-setInterval(() => {
-    const message = {
-        lat: 0,
-        long: 0,
-        alt: 0,
-        time: (new Date()).toISOString(),
-    };
 
-    console.log("Uploading data to server:", message);
-    sendMessage(message);
-}, 1000);
+
+function EstablishLoop() {
+    // Periodically send message info
+    setInterval(() => {
+        const message = {
+            lat: 0,
+            long: 0,
+            alt: 0,
+            busNumber: trackerInfo.BusNumber,
+            time: (new Date()).toISOString(),
+        };
+
+        console.log("Uploading data to server:", message);
+        SendPacket(message);
+
+        if (!ContinueTracking)
+            clearInterval();
+    }, 1000);
+}
+
+EstablishLoop();
