@@ -2,3 +2,4 @@
 node_modules/
 EncryptionKeyTests/
 package-lock.json
+package.json

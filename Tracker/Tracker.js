@@ -5,7 +5,7 @@
 const modulesRoot = "../node_modules/";
 const https = require("https");
 const http = require("http");
-const request = require(modulesRoot + "request");
+const request = require("request");
 
 const trackerInfo = require("./TrackerInfo.json");
 

@@ -4,15 +4,13 @@
 // from EDDBusTracker: $ node ./Server/ServerBase.js
 // connect to https:/localhost:8443 from browser
 
-const modulesRoot = "../node_modules/";
-
-const fs = require(modulesRoot + "file-system");
+const fs = require("fs");
 
 const https = require("https");
 const http = require("http");
 
-const express = require(modulesRoot + "express");
-const parser = require(modulesRoot + "body-parser");
+const express = require("express");
+const parser = require("body-parser");
 
 //const ws = require(modulesRoot + "ws");
 
@@ -46,20 +44,21 @@ app.get("/api/gps", (req, res) => {
 
 
 // Typical browser-access, send them web-page info
-app.all("/", (req, res) => {
+app.all("/login", (req, res) => {
     console.log("Displaying login to request", req.body);
     res.send(loginPage);
 })
-app.post("/view", (req, res) => {
+app.all("/", (req, res) => {
     console.log("On webpage, recieved login request", req.body);
 
-    if (req.body.username == "admin" && req.body.password == "password") {
+    if (!req.body.username || !req.body.password)
+        res.redirect("/login");
+    else if (req.body.username == "admin" && req.body.password == "password") {
         console.log("Login succeeded!");
         res.send(webPage);
 
     } else {    // Deny client and boot them back to login panel
-        console.log("Login failed.");
-        res.send("<body><h1>Login failed</h1><meta http-equiv=\"refresh\" content=1; url=\"../\"/></body>");
+        res.redirect("/login?failed");
     }
 })
 
