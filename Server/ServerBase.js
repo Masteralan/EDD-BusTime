@@ -16,7 +16,8 @@ const parser = require(modulesRoot + "body-parser");
 
 //const ws = require(modulesRoot + "ws");
 
-const webPage = fs.readFileSync("Client/index.html", "utf8");
+const loginPage = fs.readFileSync("Client/login.html", "utf8");
+const webPage = fs.readFileSync("Client/route_display.html", "utf8");
 
 const app = express();
 app.use(parser.urlencoded({extended:false}));
@@ -37,8 +38,18 @@ app.get("api/gps", (req, res) => {
 
 // Typical browser-access, send them web-page info
 app.all("/", (req, res) => {
-    console.log("Displaying front page");
-    res.send(webPage);
+    console.log("Displaying login to request", req.body);
+    res.send(loginPage);
+})
+app.post("/view", (req, res) => {
+    console.log("On webpage, recieved login request", req.body);
+    if (req.body.username == "admin" && req.body.password == "password") {
+        console.log("Login succeeded!");
+        res.send(webPage);
+    } else {
+        console.log("Login failed.");
+        res.send("<body>Login failed</body>");
+    }
 })
 
 
