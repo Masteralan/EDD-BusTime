@@ -1,0 +1,17 @@
+[
+    {
+        "BusNumber": 10,
+        "Stops": [
+            {
+                "Address": "Memory Lane",
+                "TimeScheduled": "8:45",
+                "Position": [0, 1, 2]
+            },
+            {
+                "Address": "Wallstreet",
+                "TimeScheduled": "8:55",
+                "Position": [1, 1, 1]
+            }
+        ]
+    }
+]

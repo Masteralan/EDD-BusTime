@@ -21,7 +21,7 @@ const app = express();
 app.use(parser.urlencoded({extended:false}));
 app.use(parser.json());
 
-//var BusData = require("./BusData.js");
+const BusData = require("./BusData.js");
 let latest_gps = null;
 
 var IsTracking = true;
