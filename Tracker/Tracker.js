@@ -35,9 +35,9 @@ function EstablishLoop() {
     // Periodically send message info
     setInterval(() => {
         const message = {
-            lat: 0,
-            long: 0,
-            alt: 0,
+            lat: Math.random() * 180 - 90,
+            long: Math.random() * 180 - 90,
+            alt: Math.random(),
             busNumber: trackerInfo.BusNumber,
             time: (new Date()).toISOString(),
         };

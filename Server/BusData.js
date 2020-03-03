@@ -47,32 +47,51 @@ function GenerateBus(busNum, stops) {
     Data.push(data);
 }
 
-function StorePoint(packet) {
-    var index = -1;
-
-    for (var i = 0; i < Data.length; i++) {
-        if (packet.busNumber == Data[i].BusNumber) {
-            index = i;
-            break;
+module.exports = {
+    GetBusData: function(busNum) {
+        for (var i = 0; i < Data.length; i++) {
+            if (busNumber == Data[i].BusNumber)
+                return Data[i];
         }
-    }
+    },
 
-    if (index == -1) {
-        console.log("Bus was not found in data list! Attempting to create a new one...");
-        GenerateBus(packet.busNumber, GetBusStops(stops));
-        return;
-    }
+    StorePoint: function(packet) {
+        var index = -1;
 
-    var pos = [packet.lat, packet.long, packet.alt];
+        for (var i = 0; i < Data.length; i++) {
+            if (packet.busNumber == Data[i].BusNumber) {
+                index = i;
+                break;
+            }
+        }
 
-    Data[index].Positions.push(pos);  
-    Data[index].Times.push(packet.time);
+        if (index == -1) {
+            console.log("Bus was not found in data list! Attempting to create a new one...");
+            GenerateBus(packet.busNumber, GetBusStops(packet.busNumber));
 
-    var stops = Data[index].Stops;
-    for (var i = 0; i < stops.length; i++) {
-        if (IsThere(pos, stops[i].Position)) {
-            stops[i].arrived = true;
-            stops[i].estimate = 0;
+            for (var i = 0; i < Data.length; i++) {
+                if (packet.busNumber == Data[i].BusNumber) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                console.warn("Failed to find newly created bus " + packet.busNumber + " in list.");
+                return;
+            }
+        }
+
+        var pos = [packet.lat, packet.long, packet.alt];
+
+        Data[index].Positions.push(pos);  
+        Data[index].Times.push(packet.time);
+
+        var stops = Data[index].Stops;
+        for (var i = 0; i < stops.length; i++) {
+            if (IsThere(pos, stops[i].Position)) {
+                stops[i].arrived = true;
+                stops[i].estimate = 0;
+            }
         }
     }
 }

@@ -42,10 +42,18 @@
 	
     <div class="route_list">
 		<div class="route">
-
+			<p id="route_info">route info goes here</p>
 		</div>
 	</div>
 	
     <br>
 	<p>graphic design is my passion</p>
+
+	<!-- https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest -->
+	<script>
+		var url = window.location.href;
+		
+		var elem = document.getElementById("route_info");
+		elem.textContent = "HI";
+	</script>
 </body>

@@ -22,13 +22,13 @@ app.use(parser.urlencoded({extended:false}));
 app.use(parser.json());
 
 const BusData = require("./BusData.js");
-let latest_gps = null;
 
 var IsTracking = true;
 
 app.post("/api/gps", (req, res) => {
     console.log("Recieved GPS input", req.body);
-    latest_gps = req.body;
+    
+    BusData.StorePoint(req.body);
 
     // Respond by telling the tracker to keep sending data (or to be done)
     res.send(IsTracking);
@@ -43,24 +43,42 @@ app.get("/api/gps", (req, res) => {
 
 
 
+// Web Application //
+
+// Confirm user's identity and locate bus number they use--returns -1 if they are not in the system
+function ConfirmIdentity(username, password) {
+    if (username == "admin" && password == "password")
+        return 10;
+    else
+        return -1;
+}
+
+
 // Typical browser-access, send them web-page info
 app.all("/login", (req, res) => {
     console.log("Displaying login to request", req.body);
     res.send(loginPage);
-})
+});
 app.all("/", (req, res) => {
     console.log("On webpage, recieved login request", req.body);
 
     if (!req.body.username || !req.body.password)
         res.redirect("/login");
-    else if (req.body.username == "admin" && req.body.password == "password") {
+    else if (ConfirmIdentity(req.body.username, req.body.password) !== -1) {
         console.log("Login succeeded!");
         res.send(webPage);
 
     } else {    // Deny client and boot them back to login panel
         res.redirect("/login?failed");
     }
-})
+});
+// Reply to estimation requests by confirming identity (currently, send raw data)
+app.post("/getEstimates", (req, res) => {
+    num = ConfirmIdentity(req.body.username, req.body.password);
+    if (num !== -1)
+        res.send(BusData.GetBusData(num));
+});
+
 
 // To generate new keys: openssl req -nodes -new -x509 -keyout key.pem -out cert.pem
 http.createServer(app).listen(8000);
