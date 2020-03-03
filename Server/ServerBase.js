@@ -26,7 +26,7 @@ const BusData = require("./BusData.js");
 var IsTracking = true;
 
 app.post("/api/gps", (req, res) => {
-    console.log("Recieved GPS input", req.body);
+    console.log("Recieved GPS input");
     
     BusData.StorePoint(req.body);
 
@@ -73,8 +73,11 @@ app.all("/", (req, res) => {
     }
 });
 // Reply to estimation requests by confirming identity (currently, send raw data)
-app.post("/getEstimates", (req, res) => {
+app.post("/get-estimate", (req, res) => {
     num = ConfirmIdentity(req.body.username, req.body.password);
+
+    console.log("Recieved request from user with bus number " + num);
+
     if (num !== -1)
         res.send(BusData.GetBusData(num));
 });

@@ -55,5 +55,12 @@
 		
 		var elem = document.getElementById("route_info");
 		elem.textContent = "HI";
+
+		var req = new XMLHttpRequest();
+		req.open("POST", url + "get-estimate", false);
+		req.send({username: "admin", password: "password"});
+
+		var reply = req.reply;
+		elem.textContent = reply;
 	</script>
 </body>
