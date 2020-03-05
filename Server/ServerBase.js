@@ -64,12 +64,14 @@ app.all("/", (req, res) => {
 
     if (!req.body.username || !req.body.password)
         res.redirect("/login");
-    else if (ConfirmIdentity(req.body.username, req.body.password) !== -1) {
-        console.log("Login succeeded!");
-        res.send(webPage.replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password));
+    else {
+        var id = ConfirmIdentity(req.body.username, req.body.password);
+        if (id !== -1) {
+            console.log("Login succeeded!");
+            res.send(webPage.replace("%BUSNUMBER",id).replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password));
 
-    } else {    // Deny client and boot them back to login panel
-        res.redirect("/login?failed");
+        } else   // Deny client and boot them back to login panel
+            res.redirect("/login?failed");
     }
 });
 // Reply to estimation requests by confirming identity (currently, send raw data)
@@ -77,9 +79,16 @@ app.post("/get-estimate", (req, res) => {
     num = ConfirmIdentity(req.body.username, req.body.password);
     console.log("Received get estimate request from user " + num + " with body ", req.body);
 
-    if (num !== -1)
-        res.send(BusData.GetBusData(num));
-    else
+    if (num !== -1) {
+        // Strip off sensitive position data from stops before sending
+        var routeList = JSON.parse(JSON.stringify(BusData.GetBusData(num).Stops));
+        for (var i = 0; i < routeList.length; i++) {
+            if (routeList[i])
+                routeList[i].Position = null;
+        }
+
+        res.send({Stops: routeList, BusNumber: num});
+    } else
         res.send("lmfao nah fam");
 });
 
