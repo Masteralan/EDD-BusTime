@@ -68,7 +68,21 @@ app.all("/", (req, res) => {
         var id = ConfirmIdentity(req.body.username, req.body.password);
         if (id !== -1) {
             console.log("Login succeeded!");
-            res.send(webPage.replace("%BUSNUMBER",id).replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password));
+            var pageData = webPage.replace("%BUSNUMBER",id).replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password);
+
+            // Systematically build the stop-list on the web-page in generated HTML
+            // - makes code easier and faster on client-side, and enforces that client only views information server can provide
+            var routeList = "";
+            var stops = BusData.GetBusData(id);
+            if (stops) {
+                stops = stops.Stops;
+                for (var i = 0; i < stops.length; i++) {
+                    if (stops[i])
+                        routeList+="<div class=\"route_info\" id=\"Stop" + stops[i].Address + "\"\n>\n<h2>" + stops[i].Address + "</h2>\n<div class=\"route_info_timing\">\n<p id=\"Stop" + stops[i].Address + "Estimate\"></p>\n</div>\n</div>\n";
+                }
+            }
+
+            res.send(pageData.replace("%ROUTE_INFO",routeList));
 
         } else   // Deny client and boot them back to login panel
             res.redirect("/login?failed");

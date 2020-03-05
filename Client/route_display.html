@@ -26,13 +26,19 @@
 			overflow: scroll;
             background-color: #fff1f1;
 			color: black;
+			text-align: left;
         }
-		div.route {
+		div.route_info {
             margin: 0%;
-            text-align: left;
-            text-indent: 5%;
+            text-indent: 2%;
             height: 100px;
+			text-align: left;
         }
+		div.route_info_timing {
+			margin: 0%;
+			text-align: right;
+		}
+
 	</style>
 </head>
 <body>
@@ -41,9 +47,7 @@
 	</div>
 	
     <div class="route_list">
-		<div class="route">
-			<p id="route_info">route info goes here</p>
-		</div>
+		%ROUTE_INFO
 	</div>
 	
     <br>
@@ -57,25 +61,31 @@
 			username: "%USERNAME",
 			password: "%PASSWORD"
 		}
-		
-		var elem = document.getElementById("route_info");
-		elem.textContent = "HI";
+
+		function UpdateRouteList(stops) {
+			for (var i = 0; i < stops.length; i++) {
+				//console.log("Checking stop" + JSON.stringify(stops[i]));
+				var e = document.getElementById("Stop" + stops[i].Address + "Estimate");
+				if (e)
+					e.textContent = stops[i].estimate + " minutes";
+			}
+		}
 
 		// Ask regularly for details
-		setInterval(() => { 
+		setInterval(() => {
 			var req = new XMLHttpRequest();
 			req.open("POST", url + "get-estimate");
 
-			req.onprogress = function (event) {
+			/*req.onprogress = function (event) {
 				console.log("Recieved progress updated ", event);
-			}
+			}*/
 			req.onerror = function () {
 				console.log("Request errored");
 			}
 
 			req.onload = function () {
-				console.log("Recieved XML reply with status " + req.status);
-				elem.textContent = req.response;
+				//console.log("Recieved XML reply with status " + req.status);
+				UpdateRouteList(JSON.parse(req.response).Stops);
 			};
 
 			req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
