@@ -66,7 +66,7 @@ app.all("/", (req, res) => {
         res.redirect("/login");
     else if (ConfirmIdentity(req.body.username, req.body.password) !== -1) {
         console.log("Login succeeded!");
-        res.send(webPage);
+        res.send(webPage.replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password));
 
     } else {    // Deny client and boot them back to login panel
         res.redirect("/login?failed");
@@ -75,19 +75,20 @@ app.all("/", (req, res) => {
 // Reply to estimation requests by confirming identity (currently, send raw data)
 app.post("/get-estimate", (req, res) => {
     num = ConfirmIdentity(req.body.username, req.body.password);
-
-    console.log("Recieved request from user with bus number " + num);
+    console.log("Received get estimate request from user " + num + " with body ", req.body);
 
     if (num !== -1)
         res.send(BusData.GetBusData(num));
+    else
+        res.send("lmfao nah fam");
 });
 
 
 // To generate new keys: openssl req -nodes -new -x509 -keyout key.pem -out cert.pem
-http.createServer(app).listen(8000);
+//http.createServer(app).listen(8000);  // HTTP protocalls are not secure--avoid use
 https.createServer({
     key: fs.readFileSync("EncryptionKeyTests/key.pem"),
     cert: fs.readFileSync("EncryptionKeyTests/cert.pem"),
 }, app).listen(8443);
 
-console.log("HTTPS on 8443, HTTP on 8000");
+console.log("HTTPS on 8443");

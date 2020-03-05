@@ -48,11 +48,14 @@ function GenerateBus(busNum, stops) {
 }
 
 module.exports = {
-    GetBusData: function(busNum) {
+    GetBusData: function(busNumber) {
         for (var i = 0; i < Data.length; i++) {
             if (busNumber == Data[i].BusNumber)
                 return Data[i];
         }
+        
+        console.warn("Bus number " + busNumber + " not found!");
+        return null;
     },
 
     StorePoint: function(packet) {

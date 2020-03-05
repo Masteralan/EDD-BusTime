@@ -49,18 +49,34 @@
     <br>
 	<p>graphic design is my passion</p>
 
-	<!-- https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest -->
+	<!-- https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest or https://javascript.info/fetch -->
 	<script>
 		var url = window.location.href;
+
+		var usr = {
+			username: "%USERNAME",
+			password: "%PASSWORD"
+		}
 		
 		var elem = document.getElementById("route_info");
 		elem.textContent = "HI";
 
-		var req = new XMLHttpRequest();
-		req.open("POST", url + "get-estimate", false);
-		req.send({username: "admin", password: "password"});
-
-		var reply = req.reply;
-		elem.textContent = reply;
+		// Ask regularly for details
+		setInterval(() => { 
+			var req = new XMLHttpRequest();
+			req.open("POST", url + "get-estimate");
+			req.onprogress = function (event) {
+				console.log("Recieved progress updated ", event);
+			}
+			req.onerror = function () {
+				console.log("Request errored");
+			}
+			req.onload = function () {
+				console.log("Recieved XML reply " + req.response + " with status " + req.status);
+				elem.textContent = req.response;
+			};
+			req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+			req.send(JSON.stringify(usr));
+		}, 1000);
 	</script>
 </body>
