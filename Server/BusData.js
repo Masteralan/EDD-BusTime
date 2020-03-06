@@ -23,10 +23,10 @@ function IsThere(pos1, pos2) {
 
 
 
-
+// Data list for current session
 var Data = [];
 
-
+// Creates a bus object within array Data, and fills it out with basic info
 function GenerateBus(busNum, stops) {
     var data = {
         BusNumber: busNum,
@@ -44,10 +44,13 @@ function GenerateBus(busNum, stops) {
         }
     }
     
+    // Pushes new object to the array
     Data.push(data);
 }
 
+// Any functions within here are callable by anything that requires this module
 module.exports = {
+    // Returns the bus data object for the provided bus number
     GetBusData: function(busNumber) {
         for (var i = 0; i < Data.length; i++) {
             if (busNumber == Data[i].BusNumber)
@@ -58,6 +61,7 @@ module.exports = {
         return null;
     },
 
+    // Stores given GPS packet into proper data field (should make estimates)
     StorePoint: function(packet) {
         var index = -1;
 
@@ -68,6 +72,7 @@ module.exports = {
             }
         }
 
+        // If bus was not found, generate one for the datapoint, but if it was still not found, return with a warning
         if (index == -1) {
             console.log("Bus was not found in data list! Attempting to create a new one...");
             GenerateBus(packet.busNumber, GetBusStops(packet.busNumber));
@@ -86,9 +91,11 @@ module.exports = {
 
         var pos = [packet.lat, packet.long, packet.alt];
 
+        // Push new info to object in Data
         Data[index].Positions.push(pos);  
         Data[index].Times.push(packet.time);
 
+        // Mark stops that the bus has arrived at, and calculate estimates for others
         var stops = Data[index].Stops;
         for (var i = 0; i < stops.length; i++) {
             if (IsThere(pos, stops[i].Position)) {

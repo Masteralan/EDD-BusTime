@@ -33,6 +33,7 @@ function SendPacket(obj) {
 
 function EstablishLoop() {
     // Periodically send message info
+    // Currently send random datapoints, will later be GPS output from Raspberry Pi
     setInterval(() => {
         const message = {
             lat: Math.random() * 180 - 90,
