@@ -99,11 +99,13 @@ app.post("/get-estimate", (req, res) => {
         // Strip off sensitive position data from stops before sending
         var routeList = JSON.parse(JSON.stringify(BusData.GetBusData(num).Stops));
         for (var i = 0; i < routeList.length; i++) {
-            if (routeList[i])
-                routeList[i].Position = null;
+            if (routeList[i]) {
+                routeList[i].Position = "";
+                routeList[i].Speeds = "";
+            }
         }
 
-        res.send({Stops: routeList, BusNumber: num});
+        res.send({Stops: routeList, BusNumber: num, Timestamp: Date.now()});
     } else  // Otherwise, reject their request
         res.send("lmfao nah fam");
 });

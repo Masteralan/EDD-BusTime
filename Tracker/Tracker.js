@@ -40,7 +40,7 @@ function EstablishLoop() {
             long: Math.random() * 180 - 90,
             alt: Math.random(),
             busNumber: trackerInfo.BusNumber,
-            time: (new Date()).toISOString(),
+            time: Date.now()
         };
 
         console.log("Uploading data to server:", message);

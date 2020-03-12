@@ -16,9 +16,16 @@ function GetBusStops(busNum) {
     console.warn("Error: Could not find route for bus number " + busNum);
     return null;
 }
+function GetDistance(pos1, pos2) {
+    return Math.sqrt(Math.pow(pos2[0] - pos1[0], 2) + Math.pow(pos2[1] - pos1[1], 2));
+}
 // Informs if one location is close enough to another based off the stopLeniency threshold
 function IsThere(pos1, pos2) {
-    return (Math.sqrt(Math.pow(pos2[0] - pos1[0],2) + Math.pow(pos2[1] - pos1[1],2) + Math.pow(pos2[2] - pos1[2], 2)) <= stopLeniency);
+    return (Math.sqrt(GetDistance(pos1, pos2)) <= stopLeniency);
+}
+// Finds the time difference from two given ISO strings
+function GetTimeDifference(time1, time2) {
+    return (time1 - time2)/1000;
 }
 
 
@@ -33,8 +40,7 @@ function GenerateBus(busNum, stops) {
         Stops: stops,
         Positions: [],
         Times: [],
-        //Speeds: []
-        maxSpeed: 0
+        Speeds: []
     }
 
     // If stops exist... Note: Busses do not need stops to be tracked as administration might want to still know their location
@@ -93,21 +99,23 @@ module.exports = {
 
         var pos = [packet.lat, packet.long, packet.alt];
 
+        const positions = Data[index].Positions;
+        const times = Data[index].Times;
+	    if (positions.length >= 1) {
+            const t = GetTimeDifference(packet.time, times[times.length-1]);
+            const latSpeed =  (pos[0] - positions[positions.length-1][0])  / t;
+            const longSpeed = (pos[1] - positions[positions.length-1][1]) / t;
+
+            console.log(GetTimeDifference(packet.time, times[times.length-1]));
+            if (t > 0) {
+                const speed = Math.sqrt(Math.pow(Math.abs(latSpeed),2) + Math.pow(Math.abs(longSpeed),2));
+                Data[index].Speeds.push(speed);
+            } else Data[index].Speeds.push(0);
+        } else Data[index].Speeds.push(0);
+
         // Push new info to object in Data
         Data[index].Positions.push(pos);  
         Data[index].Times.push(packet.time);
-	    if(Positions.length > 1)
-	    {
-            var latSpeed = (Data[index].Positions[Positions.length-1].lat - Data[index].Positions[Positions.length-2].lat)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
-            var longSpeed = (Data[index].Positions[Positions.length-1].long - Data[index].Positions[Positions.length-2].long)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
-            var altSpeed = (Data[index].Positions[Positions.length-1].alt - Data[index].Positions[Positions.length-2].alt)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
-            var speed = Math.sqrt(Math.pow(latSpeed,2) + Math.pow(longSpeed,2) + Math.pow(altSpeed,2));
-            //Data[index].Speeds.push(speed);
-            if(speed > maxSpeed)
-            {
-                maxSpeed = speed;
-            }
-	    }
 
         // Mark stops that the bus has arrived at, and calculate estimates for others
         var stops = Data[index].Stops;
@@ -115,6 +123,22 @@ module.exports = {
             if (IsThere(pos, stops[i].Position)) {
                 stops[i].arrived = true;
                 stops[i].estimate = 0;
+            } else if (!stops[i].arrived) {
+                var estimate = 0;
+                for (var j = 0; j < i; j++) {   // Account for all previos stop times
+                    estimate+=stops[j].estimate;
+                }
+                
+                // Get average speed from last stop to now
+                const speeds = Data[index].Speeds;
+                var avgSpeed = 0;
+                for (var j = 0; j < speeds.length; j++) {
+                    avgSpeed+=speeds[j]++;
+                }
+
+                avgSpeed/=speeds.length;
+                estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
+                stops[i].estimate = estimate;
             }
         }
     }

@@ -62,11 +62,32 @@
 		}
 
 		// Update HTML elements on document
-		function UpdateRouteList(stops) {
+		function UpdateRouteList(stops, timestamp) {
+			const timeDif = (Date.now() - timestamp)/1000;
 			for (var i = 0; i < stops.length; i++) {
 				var e = document.getElementById("Stop" + stops[i].Address + "Estimate");
+				stops[i].estimate-=timeDif;	// Account for time passed while sending/recieving packet
+
+				var text = "";
+
+				// Turn stop timings into text
+				if (stops[i].estimate <= 0)
+					text = "Arrived!";
+				else {
+					const minutes = Math.floor(stops[i].estimate/60);
+					const seconds = Math.floor(stops[i].estimate % 60 + 0.5);
+					if (minutes > 0)
+						text+= minutes + " minutes"
+					
+					if (minutes <= 3) {
+						if (minutes > 0)
+							text+=" ";
+						text+= seconds + " seconds"
+					}
+				}
+
 				if (e)
-					e.textContent = stops[i].estimate + " minutes";
+					e.textContent = text;
 			}
 		}
 
@@ -84,7 +105,8 @@
 
 			req.onload = function () {
 				//console.log("Recieved XML reply with status " + req.status);
-				UpdateRouteList(JSON.parse(req.response).Stops);
+				const reply = JSON.parse(req.response);
+				UpdateRouteList(reply.Stops, reply.Timestamp);
 			};
 
 			req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
