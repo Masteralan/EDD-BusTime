@@ -32,7 +32,9 @@ function GenerateBus(busNum, stops) {
         BusNumber: busNum,
         Stops: stops,
         Positions: [],
-        Times: []
+        Times: [],
+        //Speeds: []
+        maxSpeed: 0
     }
 
     // If stops exist... Note: Busses do not need stops to be tracked as administration might want to still know their location
@@ -94,6 +96,18 @@ module.exports = {
         // Push new info to object in Data
         Data[index].Positions.push(pos);  
         Data[index].Times.push(packet.time);
+	    if(Positions.length > 1)
+	    {
+            var latSpeed = (Data[index].Positions[Positions.length-1].lat - Data[index].Positions[Positions.length-2].lat)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
+            var longSpeed = (Data[index].Positions[Positions.length-1].long - Data[index].Positions[Positions.length-2].long)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
+            var altSpeed = (Data[index].Positions[Positions.length-1].alt - Data[index].Positions[Positions.length-2].alt)/(Data[index].Times[Times.length-1] - Data[index].Times[Times.length-2]);
+            var speed = Math.sqrt(Math.pow(latSpeed,2) + Math.pow(longSpeed,2) + Math.pow(altSpeed,2));
+            //Data[index].Speeds.push(speed);
+            if(speed > maxSpeed)
+            {
+                maxSpeed = speed;
+            }
+	    }
 
         // Mark stops that the bus has arrived at, and calculate estimates for others
         var stops = Data[index].Stops;
