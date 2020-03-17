@@ -27,38 +27,41 @@ function SendPacket(obj) {
     });
 }
 
-const socket = new net.Socket();
-socket.connect(2947, '127.0.0.1', function() {
-    console.log("Connected to TCP Server.");
-    socket.write('test');
-})
-socket.on('data', function(data) {
-    console.log('Recieved packet ' + data);
-})
-
-
-
 // Guide on BU-353S$ USB GPS Receiver https://www.globalsat.com.tw/ftp/download/GMouse_Win_UsersGuide-V1.0.pdf
-function EstablishLoop() {
-    // Periodically send message info
-    // Currently send random datapoints, will later be GPS output from Raspberry Pi
-    setInterval(() => {
-        const message = {
-            lat: Math.random() * 180 - 90,
-            long: Math.random() * 180 - 90,
-            alt: Math.random(),
-            busNumber: trackerInfo.BusNumber,
-            time: Date.now()
-        };
 
-        //console.log("Uploading data to server:", message);
-        SendPacket(message);
+// sudo systemctl status gpsd
+// sudo systemctl stop gpsd gpsd.socket
+// sudo systemctl disable gpsd gpsd.socket
 
-        if (!ContinueTracking) {
-            client.destroy();
-            clearInterval();
-        }
-    }, 1000);
-}
+// Run gpsd process and pipe data from it into process
+// https://nodejs.org/api/stream.html
+const child_process = require("child_process");
+const ps = child_process.spawn("gpspipe", ["-w", "localhost:2947"]);
+ps.stdout.on('data', function(data) {
+    data = data.toString();
+    //console.log(data);
+    if (data.indexOf('"TPV"') == -1) return;   // Ignore non-GPS packets
 
-EstablishLoop();
+    // If it is a GPS packet, parse it (note, this could error, may be dangerous)
+    data = JSON.parse(data);
+
+    const message = {
+        lat: data.lat,
+        long: data.lon,
+        alt: data.alt,
+        speed: data.speed,
+        busNumber: trackerInfo.BusNumber,
+        time: Date.parse(data.time)
+    };
+
+    // console.log('Sending packet to server ', message);
+    SendPacket(message);
+
+    if (!ContinueTracking) {
+        ps.kill();
+        clearInterval();
+    }
+});
+ps.stdout.on('end', function() {
+    ps.kill();
+});

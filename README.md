@@ -38,7 +38,7 @@ Our code was programmed to work with a BU-353S4 USB GPS Receiver. To get this wo
 `$ sudo apt-get update`
 
 To start the GPS tracker itself, run:
-`$ gpsd -b /dev/ttyUSB0`
+`$ gpsd -N -n -b /dev/ttyUSB0`
 With this, it should begin to run on port 2947.
 
 If you are running this on Windows, it may be better to use [this documentation](https://www.globalsat.com.tw/ftp/download/GMouse_Win_UsersGuide-V1.0.pdf) instead.
