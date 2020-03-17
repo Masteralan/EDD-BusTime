@@ -2,19 +2,17 @@
 
 // Created with help of my brother, basis pulled off from https://github.com/Maxattax97/sample-nodejs-host-client
 
-const modulesRoot = "../node_modules/";
-const https = require("https");
-const http = require("http");
 const request = require("request");
+const net = require('net');
 
 const trackerInfo = require("./TrackerInfo.json");
 
-var ContinueTracking = true;
+let ContinueTracking = true;
 
 // Sends a data packet to server
 function SendPacket(obj) {
     request.post({
-        url: "https://127.0.0.1:8443/api/gps",
+        url: "https://maxocull.com:8443/api/gps",
         method: "POST",
         json: true,
         body: obj,
@@ -29,8 +27,18 @@ function SendPacket(obj) {
     });
 }
 
+const socket = new net.Socket();
+socket.connect(2947, '127.0.0.1', function() {
+    console.log("Connected to TCP Server.");
+    socket.write('test');
+})
+socket.on('data', function(data) {
+    console.log('Recieved packet ' + data);
+})
 
 
+
+// Guide on BU-353S$ USB GPS Receiver https://www.globalsat.com.tw/ftp/download/GMouse_Win_UsersGuide-V1.0.pdf
 function EstablishLoop() {
     // Periodically send message info
     // Currently send random datapoints, will later be GPS output from Raspberry Pi
@@ -43,11 +51,13 @@ function EstablishLoop() {
             time: Date.now()
         };
 
-        console.log("Uploading data to server:", message);
+        //console.log("Uploading data to server:", message);
         SendPacket(message);
 
-        if (!ContinueTracking)
+        if (!ContinueTracking) {
+            client.destroy();
             clearInterval();
+        }
     }, 1000);
 }
 

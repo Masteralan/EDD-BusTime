@@ -7,11 +7,9 @@
 // Load in required Node Modules
 const fs = require("fs");
 const https = require("https");
-const http = require("http");
 const express = require("express");
 const parser = require("body-parser");
-// Load in data handling module
-const BusData = require("./BusData.js");
+const BusData = require("./BusData.js");    // Load in data handling module
 
 // Load in HTML data from login page and route display
 // Loads these in ahead of time so we don't have to face overhead from loading them in later
@@ -24,7 +22,7 @@ const app = express();
 app.use(parser.urlencoded({extended:false}));
 app.use(parser.json());
 
-var IsTracking = true;
+let IsTracking = true;
 
 // Bus Trackers should make GPS post requests to this location
 app.post("/api/gps", (req, res) => {
@@ -112,7 +110,6 @@ app.post("/get-estimate", (req, res) => {
 
 
 // To generate new keys: openssl req -nodes -new -x509 -keyout key.pem -out cert.pem
-//http.createServer(app).listen(8000);  // HTTP protocalls are not encrypted nor secure--avoid use
 https.createServer({
     key: fs.readFileSync("EncryptionKeyTests/key.pem"),
     cert: fs.readFileSync("EncryptionKeyTests/cert.pem"),

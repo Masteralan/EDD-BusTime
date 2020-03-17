@@ -102,6 +102,7 @@ module.exports = {
         const positions = Data[index].Positions;
         const times = Data[index].Times;
 	    if (positions.length >= 1) {
+            // Calculate speed
             const t = GetTimeDifference(packet.time, times[times.length-1]);
             const latSpeed =  (pos[0] - positions[positions.length-1][0])  / t;
             const longSpeed = (pos[1] - positions[positions.length-1][1]) / t;
@@ -114,7 +115,7 @@ module.exports = {
         } else Data[index].Speeds.push(0);
 
         // Push new info to object in Data
-        Data[index].Positions.push(pos);  
+        Data[index].Positions.push(pos);
         Data[index].Times.push(packet.time);
 
         // Mark stops that the bus has arrived at, and calculate estimates for others
@@ -137,7 +138,10 @@ module.exports = {
                 }
 
                 avgSpeed/=speeds.length;
-                estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
+                if ((i > 0 && stops[i-1].arrived) || i == 0)    // If this is the current stop or the first one, get direct distance to stop
+                    estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
+                else if (i > 0) // Otherwise, use distance from first stop to second
+                    estimate += GetDistance(stops[i-1].Position, stops[i].Position)/avgSpeed;
                 stops[i].estimate = estimate;
             }
         }
