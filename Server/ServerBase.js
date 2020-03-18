@@ -10,6 +10,7 @@ const https = require("https");
 const express = require("express");
 const parser = require("body-parser");
 const BusData = require("./BusData.js");    // Load in data handling module
+const Logins = require("./Logins.json");    // Load in log-in info
 
 // Load in HTML data from login page and route display
 // Loads these in ahead of time so we don't have to face overhead from loading them in later
@@ -40,10 +41,13 @@ app.post("/api/gps", (req, res) => {
 
 // Confirm user's identity and locate bus number they use--returns -1 if they are not in the system
 function ConfirmIdentity(username, password) {
-    if (username == "admin" && password == "password")
-        return 10;
-    else
-        return -1;
+    for (let i = 0; i < Logins.length; i++) {
+        if (username == Logins[i].username && password == Logins[i].password) {
+            return Logins[i].busNumber;
+        }
+    }
+    
+    return -1;
 }
 
 
@@ -75,8 +79,15 @@ app.all("/", (req, res) => {
             if (stops) {
                 stops = stops.Stops;
                 for (var i = 0; i < stops.length; i++) {
-                    if (stops[i])
-                        routeList+="<div class=\"route_info\" id=\"Stop" + stops[i].Address + "\"\n>\n<h2>" + stops[i].Address + "</h2>\n<div class=\"route_info_timing\">\n<p id=\"Stop" + stops[i].Address + "Estimate\"></p>\n</div>\n</div>\n";
+                    if (stops[i]) {
+                        routeList += "<div class=\"route_info\" id=\"Stop" + stops[i].Address + "\">";
+                        routeList += "<h2>" + stops[i].Address + "</h2>";
+                        routeList += "<div class=\"route_info_scheduled\">Scheduled for " + stops[i].TimeScheduled + "</div>";
+                        routeList += "<div class=\"route_info_timing\" id=\"Stop" + stops[i].Address + "Estimate\">No estimate at this time";
+                        //routeList += "<p id=\"Stop" + stops[i].Address + "Estimate\">No estimate at this time</p>\n";
+                        routeList += "</div></div>";
+                
+                    }
                 }
             }
 

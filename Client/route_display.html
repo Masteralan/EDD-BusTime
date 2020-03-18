@@ -8,12 +8,8 @@
 			text-align: center;
 			font-family: Arial, Sans-serif;
 			font-size: 20px;
+			overflow: hidden;
 		}
-		iframe {
-			height: 375px;
-			width: 75%;
-		}
-	
 		div.main_header {
 			text-align: center;
 			font-family: Arial, Sans-serif;
@@ -29,13 +25,26 @@
 			text-align: left;
         }
 		div.route_info {
-            margin: 0%;
+			margin: 0%;
+            margin-top: 0px;
+			margin-bottom: 10px;
             text-indent: 2%;
-            height: 100px;
+            height: 80px;
 			text-align: left;
         }
+		div.route_info_scheduled {
+			display: inline-block;
+			width: 30%;
+			margin-top: -10px;
+			text-indent: 10%;
+			white-space: nowrap;
+		}
 		div.route_info_timing {
-			margin: 0%;
+			display: inline-block;
+			width: 66%;
+			margin: 1%;
+			margin-top: -10px;
+			white-space: nowrap;
 			text-align: right;
 		}
 
@@ -49,9 +58,6 @@
     <div class="route_list">
 		%ROUTE_INFO
 	</div>
-	
-    <br>
-	<p>graphic design is my passion</p>
 	
 	<script>
 		var url = window.location.href;

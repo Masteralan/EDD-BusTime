@@ -1,0 +1,17 @@
+[
+    {
+        "username":"admin",
+        "password":"password",
+        "busNumber":10
+    },
+    {
+        "username":"cooldude",
+        "password":"hunter2",
+        "busNumber":10
+    },
+    {
+        "username":"abc",
+        "password":"123",
+        "busNumber":20
+    }
+]

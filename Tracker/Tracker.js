@@ -48,7 +48,7 @@ ps.stdout.on('data', function(data) {
     const message = {
         lat: data.lat,
         long: data.lon,
-        alt: data.alt,
+        //alt: data.alt,
         speed: data.speed,
         busNumber: trackerInfo.BusNumber,
         time: Date.parse(data.time)

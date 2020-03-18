@@ -3,14 +3,44 @@
         "BusNumber": 10,
         "Stops": [
             {
-                "Address": "Memory Lane",
+                "Address": "Eagle Creek Checkpoint 1",
                 "TimeScheduled": "8:45",
-                "Position": [0, 1, 2]
+                "Position": [39.999837, -86.238183]
             },
             {
-                "Address": "Wallstreet",
-                "TimeScheduled": "8:55",
-                "Position": [1, 1, 1]
+                "Address": "Eagle Creek Checkpoint 2",
+                "TimeScheduled": "8:46",
+                "Position": [40.003109, -86.233355]
+            },
+            {
+                "Address": "Eagle Creek / Shelborne",
+                "TimeScheduled": "8:50",
+                "Position": [40.016351,-86221831]
+            },
+            {
+                "Address": "Shellborne / 141st",
+                "TimeScheduled": "8:53",
+                "Position": [39.991737, -86.221717]
+            }
+        ]
+    },
+    {
+        "BusNumber": 20,
+        "Stops": [
+            {
+                "Address": "Unending Stop Light",
+                "TimeScheduled": "8:20",
+                "Position": [40.042636, -86.127693]
+            },
+            {
+                "Address": "Traffic Cop Hell",
+                "TimeScheduled": "8:40",
+                "Position": [40.050067,-86.127897]
+            },
+            {
+                "Address": "Thank GOD we finally arrived",
+                "TimeScheduled": "9:00",
+                "Position": [40.052046,-86.127899]
             }
         ]
     }
