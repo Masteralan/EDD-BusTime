@@ -2,7 +2,7 @@
 // Loads in and handles data and calculations
 
 // How close GPS coordinates have to be to be considered "there"
-const stopLeniency = 0.00015;
+const stopLeniency = 0.01;
 // Approximately how long a bus waits at a stop
 const stopApproximationLength = 25;
 
@@ -18,8 +18,16 @@ function GetBusStops(busNum) {
     console.warn("Error: Could not find route for bus number " + busNum);
     return null;
 }
+// New non-eucladian distance formula adapted from https://andrew.hedges.name/experiments/haversine/
+// Reccomended for short distances
 function GetDistance(pos1, pos2) {
-    return Math.sqrt(Math.pow(pos2[0] - pos1[0], 2) + Math.pow(pos2[1] - pos1[1], 2));
+    const dlat = pos2[0] - pos1[0];
+    const dlon = pos2[1] - pos1[1];
+
+    const a = (Math.sin(dlat/2))^2 + console(lat1) * console(lat2) * (sin(dlon(2))^2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return c * 3961;    // Convert to miles by multiplying by radius of Earth
 }
 // Informs if one location is close enough to another based off the stopLeniency threshold
 function IsThere(pos1, pos2) {
@@ -124,15 +132,14 @@ module.exports = {
 	    if (positions.length >= 1) {
             // Calculate speed
             const t = GetTimeDifference(packet.time, times[times.length-1]);
-            const latSpeed =  (pos[0] - positions[positions.length-1][0])  / t;
-            const longSpeed = (pos[1] - positions[positions.length-1][1]) / t;
 
             console.log(GetTimeDifference(packet.time, times[times.length-1]));
             if (t > 0) {
-                const speed = Math.sqrt(Math.pow(Math.abs(latSpeed),2) + Math.pow(Math.abs(longSpeed),2));
+                const speed = GetDistance(pos, positions[positions.length-1]) / t;
 
                 // Only log speeds that are moving--otherwise, it is probably waiting at a stop or intersection and should not be counted
-                if (speed > stopLeniency)
+                // Do not include speeds that are > 90 mph (0.025 miles per second)
+                if (speed * 3600 > stopLeniency && speed * 3600 < 90)
                     Data[index].Speeds.push(speed);
             }// else Data[index].Speeds.push(0);
         } else Data[index].Speeds.push(0);
@@ -163,23 +170,17 @@ module.exports = {
                     estimate+=stops[j].estimate + stops[j].TimeLeft;
                 }
                 
-                // Get average speed from last stop to now
-                const speeds = Data[index].Speeds;
-                var avgSpeed = 0;
-                for (var j = 0; j < speeds.length; j++) {
-                    avgSpeed+=speeds[j]++;
+                if (Data[index].Speeds.length > 0) {
+                    // Get average speed from last stop to now
+                    const speeds = Data[index].Speeds;
+                    var avgSpeed = 0;
+                    for (var j = 0; j < speeds.length; j++) {
+                        avgSpeed+=speeds[j]++;
+                    }
+
+                    avgSpeed/=speeds.length;
                 }
 
-                avgSpeed/=speeds.length;
-                //goes from lat/sec to miles/hour
-                if((avgSpeed*63*60*60) > 150)
-                {
-                    avgSpeed = (150/63/60/60);
-                }
-                else if((avgSpeed*63*60*60) < 10)
-                {
-                    avgSpeed = (10/63/60/60);
-                }
                 if ((i > 0 && stops[i-1].arrived) || i == 0)    // If this is the current stop or the first one, get direct distance to stop
                     estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
                 else if (i > 0) // Otherwise, use distance from first stop to second
