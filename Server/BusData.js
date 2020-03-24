@@ -171,13 +171,14 @@ module.exports = {
                 }
 
                 avgSpeed/=speeds.length;
-                if(avgSpeed > 100)
+                //goes from lat/sec to miles/hour
+                if((avgSpeed*63*60*60) > 150)
                 {
-                    avgSpeed = 100;
+                    avgSpeed = (150/63/60/60);
                 }
-                else if(avgSpeed < 25)
+                else if((avgSpeed*63*60*60) < 10)
                 {
-                    avgSpeed = 25;
+                    avgSpeed = (10/63/60/60);
                 }
                 if ((i > 0 && stops[i-1].arrived) || i == 0)    // If this is the current stop or the first one, get direct distance to stop
                     estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
