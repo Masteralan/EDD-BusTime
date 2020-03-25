@@ -37,7 +37,10 @@ app.post("/api/gps", (req, res) => {
 });
 
 
-// Web Application //
+// Session Management //
+// Random characters for string generation
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const Sessions = [];
 
 // Confirm user's identity and locate bus number they use--returns -1 if they are not in the system
 function ConfirmIdentity(username, password) {
@@ -49,6 +52,45 @@ function ConfirmIdentity(username, password) {
     
     return -1;
 }
+function ConfirmSession(session) {
+    for (let i = 0; i < Sessions.length; i++) {
+        // If the session is older than 30 minutes, remove it
+        if (Date.now() - Sessions[i].Time > 1800000) {
+            Sessions.splice(i, 1);  // Remove session from array
+            i--;
+            continue;
+        }
+
+        if (session == Sessions[i].Key) {
+            return Sessions[i].Bus;
+        }
+    }
+    
+    return -1;
+}
+// Generates a "session" for the user that can be used to validate requests for further information
+// This way, the login is sent minimally between client and server
+function GenerateSession(busNumber) {
+    let result = '';
+    
+    var charactersLength = characters.length;
+    for ( var i = 0; i < 10; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    const session = {
+        Bus: busNumber,
+        Key: result + new Date().toISOString(),
+        Time: Date.now()
+    }
+
+    Sessions.push(session);
+
+    return session.Key;
+}
+
+
+// Web Application //
 
 
 // Typical browser-access, send them web-page info (this is the login page)
@@ -69,8 +111,9 @@ app.all("/", (req, res) => {
         // If client has a bus number, then send them main-page info
         if (id !== -1) {
             console.log("Login succeeded!");
+            const session = GenerateSession(id);
             // Fills out HTML page with client's basic information
-            var pageData = webPage.replace("%BUSNUMBER",id).replace("%USERNAME", req.body.username).replace("%PASSWORD",req.body.password);
+            var pageData = webPage.replace("%BUSNUMBER",id).replace("%SESSION", session);
 
             // Systematically build the stop-list on the web-page in generated HTML
             // - makes code easier and faster on client-side, and enforces that client only views information server can provide
@@ -84,9 +127,7 @@ app.all("/", (req, res) => {
                         routeList += "<h2>" + stops[i].Address + "</h2>";
                         routeList += "<div class=\"route_info_scheduled\">Scheduled for " + stops[i].TimeScheduled + "</div>";
                         routeList += "<div class=\"route_info_timing\" id=\"Stop" + stops[i].Address + "Estimate\">No estimate at this time";
-                        //routeList += "<p id=\"Stop" + stops[i].Address + "Estimate\">No estimate at this time</p>\n";
                         routeList += "</div></div>";
-                
                     }
                 }
             }
@@ -100,7 +141,7 @@ app.all("/", (req, res) => {
 // Reply to estimation requests by confirming identity (currently, send raw data)
 app.post("/get-estimate", (req, res) => {
     // Get bus number of client
-    num = ConfirmIdentity(req.body.username, req.body.password);
+    num = ConfirmSession(req.body.key);
     console.log("Received get estimate request from user " + num + " with body ", req.body);
 
     // If the bus number is valid, send them the updated route info
@@ -116,7 +157,7 @@ app.post("/get-estimate", (req, res) => {
 
         res.send({Stops: routeList, BusNumber: num, Timestamp: Date.now()});
     } else  // Otherwise, reject their request
-        res.send("lmfao nah fam");
+        res.redirect("/login?expired");
 });
 
 
