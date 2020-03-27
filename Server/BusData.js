@@ -24,7 +24,7 @@ function GetDistance(pos1, pos2) {
     const dlat = pos2[0] - pos1[0];
     const dlon = pos2[1] - pos1[1];
 
-    const a = (Math.sin(dlat/2))^2 + console(lat1) * console(lat2) * (sin(dlon(2))^2);
+    const a = (Math.sin(dlat/2))^2 + cos(pos1[0]) * cos(pos2[0]) * (sin(dlon(2))^2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
     return c * 3961;    // Convert to miles by multiplying by radius of Earth
