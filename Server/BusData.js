@@ -24,7 +24,7 @@ function GetDistance(pos1, pos2) {
     const dlat = pos2[0] - pos1[0];
     const dlon = pos2[1] - pos1[1];
 
-    const a = (Math.sin(dlat/2))^2 + cos(pos1[0]) * cos(pos2[0]) * (sin(dlon(2))^2);
+    const a = (Math.sin(dlat/2))^2 + Math.cos(pos1[0]) * Math.cos(pos2[0]) * (Math.sin(dlon/2)^2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
     return c * 3961;    // Convert to miles by multiplying by radius of Earth
@@ -141,6 +141,7 @@ module.exports = {
                 // Do not include speeds that are > 90 mph (0.025 miles per second)
                 if (speed * 3600 > stopLeniency && speed * 3600 < 90)
                     Data[index].Speeds.push(speed);
+		    console.log("Speed is approximately ", speed * 3600, " mph");
             }// else Data[index].Speeds.push(0);
         } else Data[index].Speeds.push(0);
 
@@ -150,6 +151,7 @@ module.exports = {
 
         // Mark stops that the bus has arrived at, and calculate estimates for others
         let stops = Data[index].Stops;
+	if (stops) {
         for (let i = 0; i < stops.length; i++) {
             if (IsThere(pos, stops[i].Position)) {
                 stops[i].arrived = true;
@@ -183,10 +185,11 @@ module.exports = {
 
                 if ((i > 0 && stops[i-1].arrived) || i == 0)    // If this is the current stop or the first one, get direct distance to stop
                     estimate += GetDistance(pos, stops[i].Position)/avgSpeed;
-                else if (i > 0) // Otherwise, use distance from first stop to second
-                    estimate += GetDistance(stops[i-1].Position, stops[i].Position)/avgSpeed;
-                stops[i].estimate = estimate;
-            }
-        }
+               	else if (i > 0) // Otherwise, use distance from first stop to second
+               	    estimate += GetDistance(stops[i-1].Position, stops[i].Position)/avgSpeed;
+        	    stops[i].estimate = estimate;
+        	}
+       	}
+	}
     }
 }
