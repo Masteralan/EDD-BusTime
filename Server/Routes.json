@@ -15,10 +15,10 @@
             {
                 "Address": "Eagle Creek / Shelborne",
                 "TimeScheduled": "8:50",
-                "Position": [40.016351,-86221831]
+                "Position": [40.016351,-86.221831]
             },
             {
-                "Address": "Shellborne / 141st",
+                "Address": "Shelborne / 141st",
                 "TimeScheduled": "8:53",
                 "Position": [39.991737, -86.221717]
             }
