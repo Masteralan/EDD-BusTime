@@ -152,6 +152,7 @@ module.exports = {
             const t = GetTimeDifference(packet.time, times[times.length-1]);
 
             Log('\nTime since last packet is ' + t + ' seconds--current time is ' + (new Date().toISOString()));
+            Log('Packet lat, long is ' + packet.lat + ', ' + packet.long);
             if (t > 0) {
                 const speed = (GetDistance(pos, positions[positions.length-1]) / t) * 3600;
 
