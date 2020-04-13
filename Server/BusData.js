@@ -7,7 +7,7 @@ const filename = './logs/Log' + new Date().toISOString();
 let saving = false;
 
 // How close GPS coordinates have to be to be considered "there"
-const stopLeniency = 0.001;
+const stopLeniency = 0.002;
 // Approximately how long a bus waits at a stop
 const stopApproximationLength = 25;
 
@@ -150,18 +150,18 @@ module.exports = {
 	    if (positions.length >= 1) {
             // Calculate speed
             const t = GetTimeDifference(packet.time, times[times.length-1]);
+            const dist = GetDistance(pos, positions[positions.length-1]);
 
             Log('\nTime since last packet is ' + t + ' seconds--current time is ' + (new Date().toISOString()));
             Log('Packet lat, long is ' + packet.lat + ', ' + packet.long);
             if (t > 0) {
-                const speed = (GetDistance(pos, positions[positions.length-1]) / t) * 3600;
+                const speed = (dist / t) * 3600;
 
                 // Only log speeds that are moving--otherwise, it is probably waiting at a stop or intersection and should not be counted
                 // Do not include speeds that are > 90 mph (0.025 miles per second)
-                if (speed > stopLeniency && speed < 90)
+                if (dist > stopLeniency && speed < 90)
                     Data[index].Speeds.push(speed);
-            Log("Distance from last position to current is " + Round(GetDistance(pos, positions[positions.length-1])) +
-                " miles\nSpeed is approximately " + Round(speed) + " mph");
+            Log("Distance from last position to current is " + Round(dist) + " miles\nSpeed is approximately " + Round(speed) + " mph");
             }// else Data[index].Speeds.push(0);
         } else Data[index].Speeds.push(0);
 
