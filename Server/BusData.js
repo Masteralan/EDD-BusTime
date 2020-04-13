@@ -159,8 +159,10 @@ module.exports = {
 
                 // Only log speeds that are moving--otherwise, it is probably waiting at a stop or intersection and should not be counted
                 // Do not include speeds that are > 90 mph (0.025 miles per second)
-                if (dist > stopLeniency && speed < 90)
+                if (dist > stopLeniency && speed > 4 && speed < 90) {
+		    Log('Speed ' + speed + ' is valid and being recorded');
                     Data[index].Speeds.push(speed);
+		}
             Log("Distance from last position to current is " + Round(dist) + " miles\nSpeed is approximately " + Round(speed) + " mph");
             }// else Data[index].Speeds.push(0);
         } else Data[index].Speeds.push(0);
@@ -174,7 +176,9 @@ module.exports = {
         if (stops) {
             for (let i = 0; i < stops.length; i++) {
                 if (IsThere(pos, stops[i].Position)) {
-                    stops[i].arrived = true;
+                    if (!stops[i].arrived) Log('ARRIVAL AT STOP ' + stops[i].Address);
+
+		    stops[i].arrived = true;
                     stops[i].estimate = 0;
 
                     // Account for time bus has been waiting at the stop
